@@ -1,0 +1,168 @@
+<!DOCTYPE html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Virosfer: Misi Penjaga Imun Nusantara</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#e9f2ef;--card:#fff;--ink:#12302f;--mut:#4c6663;--ac:#b0124f;--ok:#1b7f4d;--bad:#b3261e;--line:#bcd3cd;--sun:#f0a800;--sel:#dff0ff;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#0f2224;--card:#17333a;--ink:#e4f2ee;--mut:#9ab8b2;--ac:#ff6fa3;--ok:#5fd39a;--bad:#ff8a80;--line:#2f5560;--sel:#1f4560}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#0f2224;--card:#17333a;--ink:#e4f2ee;--mut:#9ab8b2;--ac:#ff6fa3;--ok:#5fd39a;--bad:#ff8a80;--line:#2f5560;--sel:#1f4560}
+*{box-sizing:border-box}html,body{margin:0}body{background:var(--bg);color:var(--ink);font:17px/1.55 "Nunito Sans",system-ui,sans-serif}
+h1,h2,h3{font-family:"Bricolage Grotesque","Trebuchet MS",sans-serif;line-height:1.15;margin:0 0 .5em}
+main{max-width:860px;margin:0 auto;padding:16px}
+header h1{font-size:clamp(28px,6vw,46px);font-weight:800;color:var(--ac)}
+header p{margin:0 0 12px;color:var(--mut)}
+#hud{display:flex;flex-wrap:wrap;gap:8px 18px;font-weight:700;padding:10px 14px;background:var(--card);border:2px solid var(--line);border-radius:14px;margin-bottom:14px}
+#map{display:flex;align-items:flex-start;margin:6px 0 18px;position:relative}
+#map:before{content:"";position:absolute;left:12%;right:12%;top:26px;border-top:4px dotted var(--line)}
+.node{flex:1;text-align:center;position:relative}
+.node b{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 4px;border-radius:50%;background:var(--card);border:3px solid var(--line);font-size:24px}
+.node small{display:block;font-weight:700;color:var(--mut);font-size:13px;line-height:1.2}
+.node.cur b{border-color:var(--ac);box-shadow:0 0 0 5px color-mix(in srgb,var(--ac) 25%,transparent)}
+.node.done b{background:var(--ok);border-color:var(--ok);color:#fff}
+#stage{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:clamp(16px,4vw,28px)}
+.tag{font-weight:700;color:var(--mut);margin-bottom:6px}
+.opt,.mini,.go,.ghost{font:inherit;cursor:pointer;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);padding:10px 14px;text-align:left}
+.opt{display:block;width:100%;margin:8px 0;min-height:48px}
+.opt:hover,.mini:hover,.card:hover{border-color:var(--ac)}
+.sel{background:var(--sel);border-color:var(--ac)}
+.ok{border-color:var(--ok)!important;background:color-mix(in srgb,var(--ok) 18%,var(--card))}
+.bad{border-color:var(--bad)!important;background:color-mix(in srgb,var(--bad) 16%,var(--card))}
+.off{opacity:.35;pointer-events:none}
+.go{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700;margin-top:14px;text-align:center}
+.go:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:transparent;margin-top:14px;margin-right:8px}
+.tfr{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.tfr span{flex:1 1 280px}.mini{padding:6px 14px;text-align:center}
+.pool{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;min-height:48px;padding:8px;border:2px dashed var(--line);border-radius:12px}
+.card{padding:8px 14px;border:2px solid var(--line);border-radius:10px;background:var(--bg);cursor:grab;font-weight:700}
+.slot{display:flex;gap:12px;align-items:center;margin:6px 0;padding:10px 14px;min-height:48px;border:2px solid var(--line);border-radius:12px;cursor:pointer}
+.slot em{font:800 18px "Bricolage Grotesque",sans-serif;color:var(--ac);font-style:normal;min-width:20px}
+.slot i{color:var(--mut)}
+.mtr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;align-items:center;margin:8px 0}
+select,textarea{font:inherit;width:100%;padding:8px;border-radius:10px;border:2px solid var(--line);background:var(--card);color:var(--ink)}
+@media(max-width:620px){.mtr{grid-template-columns:1fr}.node small{font-size:11px}.node b{width:44px;height:44px}#map:before{top:22px}}
+.fb{margin-top:14px;padding:12px 14px;border-left:6px solid var(--sun);background:color-mix(in srgb,var(--sun) 14%,var(--card));border-radius:8px}
+table{border-collapse:collapse;margin:10px 0}td,th{border:2px solid var(--line);padding:6px 14px}
+.big{font:800 clamp(34px,8vw,56px) "Bricolage Grotesque",sans-serif;color:var(--ac)}
+button:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+#peta{--sea:#9ad8dc;--land:#bfe0a4;--land2:#86b46a;margin:4px 0 16px;border-radius:18px;overflow:hidden;border:3px solid var(--line)}
+@media(prefers-color-scheme:dark){:root:not([data-theme='light']) #peta{--sea:#1d5560;--land:#3d6b4a;--land2:#2c5239}}
+:root[data-theme='dark'] #peta{--sea:#1d5560;--land:#3d6b4a;--land2:#2c5239}
+#peta svg{display:block;width:100%;height:auto}
+.seg{fill:none;stroke:#fff;stroke-width:7;stroke-dasharray:2 14;stroke-linecap:round}
+.seg.done{stroke:var(--ac);stroke-dasharray:none}
+.nd .base{fill:var(--card);stroke:var(--line);stroke-width:5}
+.nd .ring{fill:none;stroke:var(--ac);stroke-width:4;opacity:0;transform-box:fill-box;transform-origin:center}
+.nd.cur .base{stroke:var(--ac)}.nd.cur .ring{animation:pulse 1.8s ease-out infinite}
+.nd.done .base{fill:var(--ok);stroke:var(--ok)}
+.nd.locked{opacity:.6}.nd .lock,.nd .star{display:none}.nd.locked .lock,.nd.done .star{display:inline}
+#av{transition:transform 1.1s cubic-bezier(.5,0,.2,1)}.avt{animation:hop 1.2s ease-in-out infinite}
+.vr{animation:drift 6s ease-in-out infinite;opacity:.7}
+@keyframes pulse{from{transform:scale(1);opacity:.9}to{transform:scale(1.6);opacity:0}}
+@keyframes hop{50%{transform:translateY(-6px)}}
+@keyframes drift{50%{transform:translate(14px,-10px)}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.mission{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:12px 0}
+.mission>div{background:var(--bg);border:2px solid var(--line);border-radius:12px;padding:10px 14px}
+#nav{display:flex;gap:8px;margin:0 0 12px}
+#nav button{flex:1;font:inherit;font-weight:700;padding:10px 6px;border-radius:12px;border:2px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+#nav button.on{background:var(--ac);border-color:var(--ac);color:#fff}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.mat h3{margin-top:1.2em}.mat p,.mat li{max-width:68ch}.mat ul,.mat ol{padding-left:22px}.mat .tw{overflow-x:auto}
+</style></head><body><main>
+<header><h1>Virosfer</h1><p>Misi Penjaga Imun Nusantara · Biologi Kelas X · Virus</p></header>
+<nav id='nav'></nav><div id="hud"></div><div id="peta"></div><div id="stage"></div>
+</main>
+<script>
+const $=s=>document.querySelector(s),L='ABCDE';
+const sh=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a};
+const Z=[
+{n:'Gerbang Mikroskop',i:'🔬',b:'Mata Elang Mikroskop',p:100,hint:'Virus bersifat aseluler dan parasit obligat. Tubuhnya terdiri dari asam nukleat (DNA atau RNA, salah satu saja) yang dibungkus kapsid dari kapsomer. Sebagian virus punya selubung.',
+q:[{t:'mc',q:'Seorang siswa mengamati sampel dan menyimpulkan objek itu virus, bukan bakteri. Bukti yang paling mendukung kesimpulan tersebut adalah ....',o:['Memiliki dinding sel dari peptidoglikan','Hanya dapat berkembang biak di dalam sel inang','Memiliki ribosom untuk sintesis protein','Membelah diri secara biner di medium agar','Mati oleh antibiotik'],a:1,h:'Ingat: virus tidak punya metabolisme sendiri.',e:'Virus adalah parasit obligat. Virus tidak punya ribosom maupun dinding sel, sehingga baru bereplikasi setelah masuk sel inang.'},
+{t:'mcx',q:'Pilih SEMUA pernyataan yang benar tentang struktur virus.',o:['Kapsid tersusun dari subunit protein bernama kapsomer','Setiap virus membawa DNA dan RNA sekaligus','Beberapa virus memiliki selubung (envelope) di luar kapsid','Virus memiliki membran plasma dan sitoplasma','Asam nukleat virus dapat berupa DNA atau RNA'],a:[0,2,4],h:'Satu partikel virus hanya membawa satu jenis asam nukleat.',e:'Kunci A, C, E. Virus hanya membawa satu jenis asam nukleat dan tidak punya membran plasma maupun sitoplasma.'}]},
+{n:'Lab Replikasi',i:'🧬',b:'Arsitek Replikasi',p:150,hint:'Siklus litik: adsorpsi, penetrasi, biosintesis, perakitan, lisis. Siklus lisogenik: asam nukleat virus menyatu dengan DNA inang sebagai profag. Antibiotik tidak menyasar virus.',
+q:[{t:'tf',q:'Tentukan Benar atau Salah untuk setiap pernyataan.',s:[['Pada siklus litik, sel inang pecah (lisis) di akhir siklus.',true,'Benar.'],['Pada siklus lisogenik, virus langsung merakit partikel baru dan menghancurkan sel inang.',false,'Salah. Asam nukleat virus berintegrasi dengan DNA inang sebagai profag.'],['Profag dapat diwariskan ke sel anak saat sel inang membelah.',true,'Benar.'],['Antibiotik efektif menghentikan replikasi virus di dalam sel inang.',false,'Salah. Antibiotik menyasar struktur dan proses bakteri, bukan virus.']],h:'Profag menumpang pada DNA inang.',e:'Siklus lisogenik bersifat "tidur" sampai suatu saat berubah menjadi litik.'},
+{t:'ord',q:'Seret kartu ke slot untuk menyusun siklus litik bakteriofag, dari tahap pertama.',items:['Adsorpsi (penempelan)','Penetrasi (injeksi DNA)','Biosintesis komponen virus','Perakitan partikel baru','Lisis (virus baru keluar)'],h:'Virus menempel dulu sebelum menyuntikkan DNA.',e:'Urutan: adsorpsi, penetrasi, biosintesis, perakitan, lisis.'}]},
+{n:'Kota Penyintas',i:'💉',b:'Penjaga Kesehatan',p:150,hint:'Penularan menentukan pencegahan: nyamuk dengan 3M Plus, hewan dengan vaksinasi hewan, tumbuhan dengan bibit sehat. Vaksin melatih imun lewat antigen sehingga terbentuk sel memori.',
+q:[{t:'mt',q:'Jodohkan setiap penyakit dengan virus penyebab dan upaya pencegahannya.',rows:[['COVID-19','SARS-CoV-2','Vaksinasi dan masker'],['Demam berdarah','Dengue (DENV)','Pemberantasan sarang nyamuk (3M Plus)'],['Rabies','Lyssavirus','Vaksinasi hewan peliharaan'],['Mosaik tembakau','TMV','Bibit sehat dan sanitasi alat']],h:'Pikirkan cara penularannya.',e:'Pencegahan selalu mengikuti jalur penularan virusnya.'},
+{t:'ord',q:'Susun cara kerja vaksin, dari langkah pertama.',items:['Vaksin (antigen yang dilemahkan atau dimatikan) dimasukkan ke tubuh','Sistem imun mengenali antigen sebagai benda asing','Limfosit B membentuk antibodi dan sel memori','Tubuh terpapar virus asli dan merespons cepat dan kuat'],h:'Sel memori baru berguna saat paparan kedua.',e:'Sel memori membuat respons terhadap virus asli menjadi cepat dan kuat.'}]},
+{n:'Benteng Wabah',i:'🏰',b:'Virolog Nusantara',p:300,q:[]}];
+let S,d={};
+function reset(){S={v:'brief',ov:'intro',rt:0,z:0,q:0,h:5,p:0,badges:[],help:true,fr:[],kar:false,locked:false,boss:{a:['','',''],s:[null,null,null],key:false}};d={};R()}
+function R(){const h=Math.max(S.h,0);
+$('#hud').innerHTML=`<span>${'❤️'.repeat(h)}${'🖤'.repeat(5-h)} Nyawa imun</span><span>⭐ ${S.p} poin</span><span>🏅 ${S.badges.join(', ')||'Belum ada lencana'}</span>`;
+drawMap();
+$('#stage').innerHTML=S.ov?({intro:vPeng,ref:vRef})[S.ov]():({brief:vBrief,mat:vMat,q:vQ,zr:vZR,boss:vBoss,final:vFinal})[S.v]();
+$('#nav').innerHTML=[[1,'📖 Pengantar','intro'],[2,'📚 Materi','ref'],[0,'🗺️ Misi','']].map(x=>`<button class='${(S.ov||'')==x[2]?'on':''}' onclick='nav(${x[0]})'>${x[1]}</button>`).join('')}
+function vIntro(){return `<h2>Tahun 2031: wabah di Nusantara Raya</h2><p>Penyakit misterius menyebar dan tidak sembuh dengan antibiotik. Kamu adalah Agen Virolog Muda di Lembaga Imun Nusantara. Telusuri jejak sang penyusup mikroskopis lewat empat zona, lalu hadapi wabah di Benteng.</p>
+<p><b>Aturan:</b> mulai dengan 5 nyawa. Soal yang dijawab kurang dari 70% benar mengurangi 1 nyawa. Zona lulus jika rata-rata skor minimal 70%. Gagal berarti masuk Jalur Karantina (poin maksimal 50%). Masuk Benteng butuh minimal 2 nyawa. Kartu Bantuan hanya bisa dipakai 1 kali.</p><button class="go" onclick="startZone()">Mulai misi</button>`}
+function startZone(){S.q=0;S.fr=[];S.locked=false;d={};S.v='brief';R()}
+function begin(){S.v='mat';R();$('#stage').scrollIntoView()}
+function practice(){S.v=S.z==3?'boss':'q';R();$('#stage').scrollIntoView()}
+function nav(n){S.ov=[null,'intro','ref'][n];if(n==2)S.rt=Math.min(S.z,3);R();$('#stage').scrollIntoView()}
+const MT=[
+{t:'Mengenal virus: ciri dan struktur',h:`<p>Virus adalah partikel berukuran sangat kecil (sekitar 20-300 nm) yang hanya terlihat dengan mikroskop elektron. Virus bersifat <b>aseluler</b> (tidak tersusun dari sel) dan merupakan <b>parasit obligat</b>: hanya dapat bereplikasi di dalam sel inang. Di luar inang, virus tidak menunjukkan aktivitas hidup.</p><h3>Struktur tubuh virus</h3><ul><li><b>Asam nukleat:</b> DNA atau RNA (salah satu saja, tidak keduanya).</li><li><b>Kapsid:</b> selubung protein yang tersusun dari subunit bernama kapsomer.</li><li><b>Selubung (envelope):</b> lapisan lipid tambahan pada sebagian virus, misalnya virus influenza dan SARS-CoV-2.</li></ul><p>Bakteriofag (virus pemakan bakteri) memiliki kepala (kapsid berisi DNA), leher, selubung ekor, lempeng dasar, dan serabut ekor.</p><h3>Virus dan bakteri</h3><div class='tw'><table><tr><th>Ciri</th><th>Virus</th><th>Bakteri</th></tr><tr><td>Struktur</td><td>Aseluler</td><td>Sel prokariotik</td></tr><tr><td>Materi genetik</td><td>DNA atau RNA</td><td>DNA dan RNA</td></tr><tr><td>Ribosom dan metabolisme sendiri</td><td>Tidak ada</td><td>Ada</td></tr><tr><td>Cara berkembang biak</td><td>Replikasi di dalam sel inang</td><td>Pembelahan biner</td></tr><tr><td>Antibiotik</td><td>Tidak efektif</td><td>Efektif</td></tr></table></div>`},
+{t:'Replikasi virus: litik dan lisogenik',h:`<p>Virus tidak punya mesin sintesis sendiri, sehingga memakai enzim dan bahan sel inang untuk membuat salinan dirinya.</p><h3>Siklus litik (5 tahap)</h3><ol><li><b>Adsorpsi:</b> virus menempel pada reseptor sel inang.</li><li><b>Penetrasi:</b> asam nukleat virus masuk ke sel inang.</li><li><b>Biosintesis:</b> sel inang dipaksa membuat asam nukleat dan protein virus.</li><li><b>Perakitan:</b> komponen virus dirakit menjadi partikel baru.</li><li><b>Lisis:</b> sel inang pecah dan virus baru keluar.</li></ol><h3>Siklus lisogenik</h3><p>Setelah penetrasi, asam nukleat virus menyatu dengan DNA inang sebagai <b>profag</b>. Sel inang tetap hidup dan membelah, sehingga profag ikut diwariskan ke sel anak. Pada kondisi tertentu (misalnya stres), profag aktif dan siklus berubah menjadi litik.</p><h3>Catatan</h3><p>Retrovirus seperti HIV memiliki genom RNA dan memakai enzim <b>reverse transkriptase</b> untuk membuat DNA dari RNA-nya. Antibiotik tidak bekerja pada virus karena virus tidak punya struktur dan proses yang menjadi sasaran antibiotik.</p>`},
+{t:'Peran virus bagi kehidupan',h:`<h3>Peran merugikan</h3><ul><li><b>Manusia:</b> COVID-19 (SARS-CoV-2), demam berdarah (virus dengue, ditularkan nyamuk Aedes aegypti), influenza, rabies, HIV/AIDS, campak.</li><li><b>Hewan:</b> flu burung dan penyakit mulut dan kuku.</li><li><b>Tumbuhan:</b> penyakit mosaik tembakau (TMV).</li></ul><h3>Peran menguntungkan</h3><ul><li><b>Vaksin:</b> memakai virus yang dilemahkan atau dimatikan, atau bagian virus (antigen), agar tubuh membentuk antibodi dan sel memori.</li><li><b>Rekayasa genetika:</b> virus dipakai sebagai pembawa (vektor) gen.</li><li><b>Pengendali hama:</b> misalnya Baculovirus untuk membasmi ulat hama.</li><li><b>Terapi fag:</b> bakteriofag diteliti untuk melawan bakteri yang kebal antibiotik.</li></ul><h3>Pencegahan</h3><p>Vaksinasi, PHBS (cuci tangan, masker saat sakit), pemberantasan sarang nyamuk (3M Plus), vaksinasi hewan peliharaan, dan bibit tanaman yang sehat. Pencegahan selalu mengikuti jalur penularan virusnya.</p>`},
+{t:'Bekal Boss: membaca data wabah',h:`<h3>Menganalisis data</h3><ul><li>Persentase sakit = jumlah sakit dibagi jumlah anggota kelompok, dikali 100. Bandingkan persentase, bukan jumlah mentahnya, karena ukuran kelompok berbeda.</li><li>Vaksin menurunkan risiko sakit tetapi tidak menjamin 100% terlindungi.</li><li>Kekebalan kelompok: semakin banyak orang yang divaksin, semakin kecil peluang virus menyebar, sehingga yang belum divaksin ikut terlindungi.</li></ul><h3>Menjawab dengan penalaran</h3><ul><li>Gunakan angka dari data sebagai bukti kesimpulan.</li><li>Hubungkan dengan ciri virus: aseluler, parasit obligat, tidak punya sasaran antibiotik.</li></ul><h3>Merancang kampanye</h3><p>Tentukan <b>sasaran</b> (siapa), <b>pesan utama</b> (apa, didukung data), dan <b>media</b> (poster, video pendek, media sosial sekolah).</p>`}];
+function matHTML(i){return `<div class='mat'><h2>${Z[i].i} ${MT[i].t}</h2>${MT[i].h}</div>`}
+function vMat(){return `<div class='tag'>Materi zona ${S.z+1}: ${Z[S.z].n}${S.kar?' · Jalur Karantina':''}</div>${matHTML(S.z)}<button class='go' onclick='practice()'>${S.z==3?'Hadapi Boss Battle':'Mulai latihan soal'}</button>`}
+function vRef(){return `<div class='tag'>Menu materi</div><div class='tabs'>${Z.map((z,i)=>`<button class='mini ${S.rt==i?'sel':''}' onclick='S.rt=${i};R()'>${z.i} ${z.n}</button>`).join('')}</div>${matHTML(S.rt)}<button class='go' onclick='nav(0)'>Kembali ke misi</button>`}
+function vPeng(){return `<div class='mat'><h2>Selamat datang, Agen Virolog Muda</h2><p>Tahun 2031. Kota Nusantara Raya diserang penyakit misterius yang tidak sembuh dengan antibiotik. Kamu bertugas di Lembaga Imun Nusantara untuk menelusuri jejak sang penyusup mikroskopis, lalu menghadapi wabah di Benteng.</p><h3>Tujuan belajar</h3><ul><li>Mendeskripsikan karakteristik dan struktur virus.</li><li>Menjelaskan tahapan replikasi virus.</li><li>Menganalisis peran virus bagi kehidupan dan upaya pencegahannya.</li></ul><h3>Alur setiap misi</h3><ol><li>Baca briefing misi di peta.</li><li>Pelajari materi zona.</li><li>Kerjakan latihan soal untuk membuka zona berikutnya.</li></ol><h3>Aturan permainan</h3><p>Mulai dengan 5 nyawa. Soal yang dijawab kurang dari 70% benar mengurangi 1 nyawa. Zona lulus jika rata-rata skor minimal 70%. Gagal berarti masuk Jalur Karantina (poin maksimal 50%). Masuk Benteng butuh minimal 2 nyawa. Kartu Bantuan hanya bisa dipakai 1 kali. Materi bisa dibuka kapan saja lewat menu Materi.</p></div><button class='ghost' onclick='nav(2)'>Buka menu materi</button><button class='go' onclick='nav(0)'>Mulai misi pertama</button>`}
+const M=['Kenali wujud sang penyusup: ciri dan struktur virus.','Bongkar cara virus memperbanyak diri di dalam sel inang.','Hubungkan virus, penyakit, pencegahan, dan vaksin.','Bedah wabah di sekolah memakai data dan penalaran.'];
+function vBrief(){const z=Z[S.z];return `<div class='tag'>Misi ${S.z+1} dari 4${S.kar?' · Jalur Karantina':''}</div><h2>${z.i} ${z.n}</h2><div class='mission'><div><b>Misi utama</b><br>${M[S.z]}</div><div><b>Imbalan</b><br>⭐ hingga ${S.kar?z.p/2:z.p} poin<br>🏅 Lencana ${z.b}</div><div><b>Syarat lulus</b><br>${S.z==3?'Minimal 2 nyawa untuk masuk':'Skor minimal 70%'}</div></div><button class='go' onclick='begin()'>Pelajari materi dulu</button>`}
+const P=[[110,320],[310,170],[520,290],[690,130]];
+function drawMap(){const el=$('#peta');
+if(!el.firstChild){
+const seg=(a,b,i)=>`<path id='s${i}' class='seg' d='M${a[0]},${a[1]} C${a[0]+90},${a[1]} ${b[0]-90},${b[1]} ${b[0]},${b[1]}'/>`;
+const nd=(p,i)=>{const n=Z[i].n,w=n.length*8.5+24;return `<g id='n${i}' class='nd' transform='translate(${p[0]},${p[1]})'><circle class='ring' r='34'/><circle class='base' r='34'/><text y='12' text-anchor='middle' font-size='34'>${Z[i].i}</text><text class='lock' x='26' y='-20' font-size='20'>🔒</text><text class='star' x='26' y='-20' font-size='22'>⭐</text><rect x='${-w/2}' y='46' width='${w}' height='26' rx='13' fill='var(--card)' stroke='var(--line)' stroke-width='2'/><text y='64' text-anchor='middle' font-size='14' font-weight='700' fill='var(--ink)'>${n}</text></g>`};
+const deco=[['🌴',60,290],['🌴',150,385],['🌿',240,235],['⛰️',380,105],['🌳',450,205],['🌴',610,355],['🌳',600,175],['⛰️',745,215]].map(t=>`<text x='${t[1]}' y='${t[2]}' font-size='30' opacity='.85'>${t[0]}</text>`).join('');
+const vr=[[200,60],[560,40],[90,150]].map((t,i)=>`<text class='vr' style='animation-delay:${i*1.5}s' x='${t[0]}' y='${t[1]}' font-size='30'>🦠</text>`).join('');
+el.innerHTML=`<svg viewBox='0 0 800 440' role='img' aria-label='Peta misi empat zona'><rect width='800' height='440' fill='var(--sea)'/><g stroke='#fff' fill='none' opacity='.6' stroke-width='3' stroke-linecap='round'><path d='M600,410 q10,-10 20,0 t20,0'/><path d='M20,60 q10,-10 20,0 t20,0'/><path d='M330,30 q10,-10 20,0 t20,0'/></g><path d='M40,360 C20,260 90,230 150,250 C190,170 260,100 360,110 C420,60 520,70 560,130 C640,80 760,60 780,140 C800,230 740,260 700,300 C680,400 560,420 480,380 C400,420 300,400 260,360 C200,420 70,430 40,360Z' fill='var(--land)' stroke='var(--land2)' stroke-width='6'/>${deco}${vr}${[0,1,2].map(i=>seg(P[i],P[i+1],i)).join('')}${P.map(nd).join('')}<g id='av'><text class='avt' text-anchor='middle' font-size='40'>🧑‍🔬</text></g><rect x='14' y='12' width='222' height='30' rx='15' fill='var(--card)' stroke='var(--line)' stroke-width='2'/><text x='125' y='33' text-anchor='middle' font-size='15' font-weight='800' fill='var(--ac)'>Peta Misi Nusantara Raya</text></svg>`}
+const fin=S.v=='final';
+for(let i=0;i<4;i++){$('#n'+i).setAttribute('class','nd '+(i<S.z||fin?'done':i==S.z?'cur':'locked'));if(i<3)$('#s'+i).setAttribute('class','seg'+(i<S.z||fin?' done':''))}
+$('#av').style.transform=`translate(${P[S.z][0]}px,${P[S.z][1]-52}px)`}
+function vQ(){const z=Z[S.z],q=z.q[S.q],key=S.z+'-'+S.q;
+if(d.k!=key){d={k:key,sel:[],tf:[],m:[],el:[],hint:false,fb:''};if(q.t=='ord'){d.slots=q.items.map(()=>-1);d.pool=sh(q.items.map((_,i)=>i))}if(q.t=='mt')d.cols=[sh(q.rows.map(r=>r[1])),sh(q.rows.map(r=>r[2]))]}
+const lk=S.locked;let b='';
+if(q.t=='mc')b=q.o.map((t,i)=>`<button class="opt ${d.el.includes(i)?'off':''} ${lk?(i==q.a?'ok':d.pk==i?'bad':''):''}" onclick="pick(${i})">${L[i]}. ${t}</button>`).join('');
+if(q.t=='mcx')b=q.o.map((t,i)=>{const s=d.sel.includes(i);return `<button class="opt ${s?'sel':''} ${lk?(q.a.includes(i)?'ok':s?'bad':''):''}" onclick="tog(${i})">${s?'☑':'☐'} ${L[i]}. ${t}</button>`}).join('')+`<button class="go" ${lk?'hidden':''} onclick="chkx()">Periksa jawaban</button>`;
+if(q.t=='tf')b=q.s.map((s,i)=>`<div class="tfr"><span>${lk?(d.tf[i]===s[1]?'✔ ':'✘ '):''}${s[0]}${lk?`<br><small>${s[2]}</small>`:''}</span><button class="mini ${d.tf[i]===true?'sel':''}" onclick="stf(${i},true)">Benar</button><button class="mini ${d.tf[i]===false?'sel':''}" onclick="stf(${i},false)">Salah</button></div>`).join('')+`<button class="go" ${lk?'hidden':''} ${q.s.every((_,i)=>d.tf[i]!==undefined)?'':'disabled'} onclick="chktf()">Periksa jawaban</button>`;
+if(q.t=='ord')b=`<div class="pool">${d.pool.map(i=>`<div class="card" draggable="true" ondragstart="event.dataTransfer.setData('t',${i})" onclick="plc(${i})">${q.items[i]}</div>`).join('')||'<i>Semua kartu sudah ditempatkan</i>'}</div>`+d.slots.map((v,k)=>`<div class="slot ${lk?(v==k?'ok':'bad'):''}" ondragover="event.preventDefault()" ondrop="drp(event,${k})" onclick="unp(${k})"><em>${k+1}</em>${v>=0?q.items[v]:'<i>Letakkan kartu di sini</i>'}</div>`).join('')+`<small>Seret kartu ke slot, atau ketuk kartu agar mengisi slot kosong pertama. Ketuk slot terisi untuk mengembalikan.</small><br><button class="go" ${lk?'hidden':''} ${d.slots.includes(-1)?'disabled':''} onclick="chko()">Periksa urutan</button>`;
+if(q.t=='mt')b=q.rows.map((r,i)=>{const m=d.m[i]||[];return `<div class="mtr"><b>${lk?(m[0]==r[1]&&m[1]==r[2]?'✔ ':'✘ '):''}${r[0]}</b>${[1,2].map(c=>`<select ${lk?'disabled':''} onchange="sm(${i},${c-1},this.value)"><option value="">${c==1?'Virus penyebab':'Pencegahan'}</option>${d.cols[c-1].map(v=>`<option ${m[c-1]==v?'selected':''}>${v}</option>`).join('')}</select>`).join('')}</div>${lk?`<small>Kunci: ${r[1]}; ${r[2]}</small>`:''}`}).join('')+`<button class="go" ${lk?'hidden':''} onclick="chkm()">Periksa jawaban</button>`;
+const last=S.q==z.q.length-1;
+return `<div class="tag">Zona ${S.z+1}: ${z.n} · soal ${S.q+1} dari ${z.q.length}${S.kar?' · Jalur Karantina':''}</div><h3>${q.q}</h3>${b}
+${!lk&&S.help?`<button class="ghost" onclick="help()">🆘 Pakai Kartu Bantuan</button>`:''}${d.hint?`<div class="fb">Petunjuk: ${q.h}</div>`:''}
+${lk?`<div class="fb"><b>${d.msg}</b> ${q.e}</div><button class="go" onclick="nx()">${last?'Lihat hasil zona':'Soal berikutnya'}</button>`:''}`}
+function help(){S.help=false;d.hint=true;const q=Z[S.z].q[S.q];if(q.t=='mc')d.el=sh(q.o.map((_,i)=>i).filter(i=>i!=q.a)).slice(0,2);R()}
+function fin(f){S.locked=true;S.fr.push(f);if(f<.7)S.h--;d.msg=f==1?'Tepat!':f>=.7?'Hampir sempurna.':'Belum tepat.';R()}
+function pick(i){if(S.locked)return;d.pk=i;fin(i==Z[S.z].q[S.q].a?1:0)}
+function tog(i){if(S.locked)return;const k=d.sel.indexOf(i);k<0?d.sel.push(i):d.sel.splice(k,1);R()}
+function chkx(){const a=Z[S.z].q[S.q].a,r=d.sel.filter(i=>a.includes(i)).length,w=d.sel.length-r;fin(Math.max(0,(r-w)/a.length))}
+function stf(i,v){if(S.locked)return;d.tf[i]=v;R()}
+function chktf(){const s=Z[S.z].q[S.q].s;fin(s.filter((x,i)=>d.tf[i]===x[1]).length/s.length)}
+function plc(i){if(S.locked)return;const k=d.slots.indexOf(-1);if(k<0)return;d.slots[k]=i;d.pool=d.pool.filter(x=>x!=i);R()}
+function drp(e,k){e.preventDefault();if(S.locked)return;const i=+e.dataTransfer.getData('t');if(isNaN(i)||!d.pool.includes(i))return;const o=d.slots[k];d.slots[k]=i;d.pool=d.pool.filter(x=>x!=i);if(o>=0)d.pool.push(o);R()}
+function unp(k){if(S.locked)return;const v=d.slots[k];if(v<0)return;d.slots[k]=-1;d.pool.push(v);R()}
+function chko(){fin(d.slots.filter((v,k)=>v==k).length/d.slots.length)}
+function sm(i,c,v){d.m[i]=d.m[i]||['',''];d.m[i][c]=v}
+function chkm(){const r=Z[S.z].q[S.q].rows;let n=0;r.forEach((x,i)=>{const m=d.m[i]||[];if(m[0]==x[1])n++;if(m[1]==x[2])n++});fin(n/(r.length*2))}
+function nx(){S.locked=false;S.q++;if(S.q>=Z[S.z].q.length)S.v='zr';R()}
+function avg(){return S.fr.reduce((a,b)=>a+b,0)/S.fr.length}
+function pts(){return Math.round(Z[S.z].p*avg()*(S.kar?.5:1))}
+function vZR(){const z=Z[S.z],a=avg(),ok=a>=.7;
+return `<h2>${ok?'Zona dikuasai!':'Zona belum lulus'}</h2><p>Skor rata-rata <b>${Math.round(a*100)}%</b> (syarat 70%). ${ok?`Kamu mendapat <b>${pts()} poin</b> dan lencana <b>${z.b}</b>.`:'Baca ringkasan ini, lalu coba lagi lewat Jalur Karantina.'}</p>
+${ok?`<button class="go" onclick="claim()">${S.z==2?'Menuju Benteng Wabah':'Ke zona berikutnya'}</button>`:`<div class="fb">${z.hint}</div><button class="go" onclick="S.kar=true;S.h=Math.max(S.h,1);startZone()">Masuk Jalur Karantina</button>`}`}
+function claim(){S.p+=pts();S.badges.push(Z[S.z].b);S.z++;S.kar=false;startZone()}
+function vBoss(){const B=S.boss;
+if(S.h<2)return `<h2>Nyawa imun tidak cukup</h2><p>Benteng Wabah butuh minimal 2 nyawa. Pulihkan imun dan mulai ulang misi.</p><button class="go" onclick="reset()">Mulai ulang</button>`;
+const P=['Fase analisis: hitung persentase siswa sakit pada tiap kelompok, lalu simpulkan hubungan vaksinasi dengan kejadian sakit.','Fase evaluasi: mengapa antibiotik tidak menyembuhkan siswa? Hubungkan dengan ciri virus.','Fase kreasi: rancang satu strategi kampanye untuk menaikkan cakupan vaksinasi di sekolah (sasaran, pesan utama, media).'];
+const K=['Vaksinasi lengkap: 4/180 ≈ 2,2%. Belum vaksinasi: 16/20 = 80%. Vaksinasi menurunkan risiko sakit secara nyata, tetapi tidak 100% (masih ada 4 kasus).','Virus aseluler dan hanya bereplikasi di dalam sel inang, tanpa dinding sel, ribosom, atau metabolisme sendiri. Antibiotik menyasar struktur dan proses bakteri sehingga tidak punya sasaran pada virus.','Jawaban terbuka. Cek: sasaran jelas, pesan berbasis data (2,2% vs 80%), media sesuai remaja.'];
+const done=B.s.every(x=>x!==null);
+return `<div class="tag">Boss Battle · HOTS</div><h2>Wabah di SMA Sukamaju</h2><p>Di SMA Sukamaju (200 siswa) terjadi wabah dengan gejala demam tinggi dan ruam merah. Dokter puskesmas menyatakan penyebabnya virus. Sebagian siswa diberi antibiotik, tetapi gejalanya tidak membaik.</p>
+<table><tr><th>Kelompok</th><th>Jumlah siswa</th><th>Jumlah sakit</th></tr><tr><td>Vaksinasi lengkap</td><td>180</td><td>4</td></tr><tr><td>Belum vaksinasi</td><td>20</td><td>16</td></tr></table>
+${P.map((p,i)=>`<p><b>${p}</b></p><textarea rows="3" oninput="S.boss.a[${i}]=this.value">${B.a[i]}</textarea>${B.key?`<div class="fb">Kunci: ${K[i]}<br>Skor guru: ${[0,1,2,3,4].map(n=>`<button class="mini ${B.s[i]===n?'sel':''}" onclick="S.boss.s[${i}]=${n};R()">${n}</button>`).join(' ')}</div>`:''}`).join('')}
+${B.key?`<small>Rubrik 0-4: 4 data benar dan konsep tepat · 3 konsep kurang lengkap · 2 sebagian benar · 1 tanpa dasar · 0 tidak menjawab.</small><br><button class="go" ${done?'':'disabled'} onclick="endBoss()">Selesaikan Boss</button>`:`<button class="go" onclick="S.boss.key=true;R()">Lihat kunci dan nilai (guru)</button>`}`}
+function endBoss(){S.p+=Math.round(S.boss.s.reduce((a,b)=>a+b,0)/12*300);S.badges.push('Virolog Nusantara');S.z=3;S.v='final';R()}
+function vFinal(){const g=S.p>=600?'Virolog Nusantara':S.p>=400?'Virolog Muda':'Agen Magang';
+return `<h2>Misi selesai</h2><div class="big">${S.p} / 700</div><p>Gelar tim: <b>${g}</b></p><p>Lencana: ${S.badges.join(', ')}.</p><div class="fb">Refleksi: konsep tentang virus apa yang paling mengubah cara pandangmu? Bagaimana kamu akan menerapkannya untuk menjaga kesehatan di sekitarmu?</div><button class="go" onclick="reset()">Main lagi</button>`}
+reset();
+</script></body></html>
